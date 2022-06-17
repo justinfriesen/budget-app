@@ -2,9 +2,14 @@ import { Container, Stack, Button } from "react-bootstrap"
 import BudgetCard  from "./components/BudgetCard"
 import AddBudgetModal from "./components/AddBudgetModal";
 import { useState } from "react"
+import { useBudgets } from "./contexts/BudgetsContext";
+import AddExpenseModal from "./components/AddExpenseModal";
 
 function App() {
   const [showAddBudgetModal, setShowAddBudgetModal] = useState(false)
+  const [showAddExpenseModal, setShowAddExpenseModal] = useState(false)
+
+  const { budgets, getBudgetExpenses } = useBudgets()
   return (
 
   <>
@@ -19,9 +24,19 @@ function App() {
         gridTemplateColumns:"repeat(auto-fill, minmax(300px, 1fr))", 
         gap:"1rem", 
         alignItems:"flex-start"}}> 
-        <BudgetCard name="Entertainment" gray amount={100} max={1000}>
+        {budgets.map(budget => {
+          const amount = getBudgetExpenses(budget.id).reduce((total, expense) => total + expense.amount, 0
+          )
+          return (
+            <BudgetCard
+          key={budget.id}
+          name={budget.name} 
+          amount={amount} 
+          max={budget.max}/>
 
-        </BudgetCard>
+          )
+        })}
+        
         {/* Gap between items */}
         {/* Margin on edge of budgets will eb auto */}
         {/* Min size of all cards = 300px, takes up 1fr max space*/}
@@ -31,6 +46,8 @@ function App() {
 
     </Container>
     <AddBudgetModal show={showAddBudgetModal} handleClose={() =>
+    setShowAddBudgetModal(false)}/>
+    <AddExpenseModal show={true} handleClose={() =>
     setShowAddBudgetModal(false)}/>
   </>
   )
